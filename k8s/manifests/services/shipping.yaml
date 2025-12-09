@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping
+  namespace: three-tier-demo
+  labels:
+    app: shipping
+spec:
+  selector:
+    app: shipping
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping
+  namespace: three-tier-demo
+  labels:
+    app: shipping
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shipping
+  template:
+    metadata:
+      labels:
+        app: shipping
+    spec:
+      containers:
+        - name: shipping
+          image: "robotshop/rs-shipping:latest"
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: MONGO_HOST
+              value: "mongodb"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+        #  livenessProbe:
+        #    httpGet:
+        #      path: /health
+        #      port: http
+        #    initialDelaySeconds: 20
+        #    periodSeconds: 10
+        #  readinessProbe:
+        #    httpGet:
+        #      path: /health
+        #      port: http
+        #    initialDelaySeconds: 10
+        #    periodSeconds: 5

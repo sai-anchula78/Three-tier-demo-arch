@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: three-tier-demo
+  labels:
+    app: web
+spec:
+  selector:
+    app: web
+  ports:
+    - name: http
+      port: 80           # external LB port
+      targetPort: 8080   # container port
+  type: LoadBalancer     # EKS will create an ELB/NLB
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: three-tier-demo
+  labels:
+    app: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: "robotshop/rs-web:latest"
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: CATALOGUE_HOST
+              value: "catalogue"
+            - name: USER_HOST
+              value: "user"
+            - name: CART_HOST
+              value: "cart"
+            - name: RATINGS_HOST
+              value: "ratings"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
