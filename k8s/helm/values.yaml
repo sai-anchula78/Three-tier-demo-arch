@@ -1,0 +1,115 @@
+# ------------------------------------------------------------
+# Global Configuration
+# ------------------------------------------------------------
+namespace: three-tier-demo
+
+global:
+  imagePullPolicy: IfNotPresent
+  # You can add:
+  # registry: <your ECR repo> 
+  # pullSecrets: []
+
+# ------------------------------------------------------------
+# Database / Messaging Components
+# ------------------------------------------------------------
+
+mongodb:
+  image: robotshop/rs-mongodb
+  tag: latest
+  storage: 5Gi
+
+mysql:
+  image: robotshop/rs-mysql-db
+  tag: latest
+  storage: 5Gi
+  user: robot
+  password: robotshop
+  rootPassword: rootpassword
+  database: robotshop
+
+redis:
+  image: redis
+  tag: alpine
+  storage: 2Gi
+
+rabbitmq:
+  image: rabbitmq
+  tag: 3-management-alpine
+
+# ------------------------------------------------------------
+# Microservices
+# (Each service has its own section for image/tag/replicas/env)
+# ------------------------------------------------------------
+
+catalogue:
+  image: robotshop/rs-catalogue
+  tag: latest
+  replicas: 1
+
+user:
+  image: robotshop/rs-user
+  tag: latest
+  replicas: 1
+
+cart:
+  image: robotshop/rs-cart
+  tag: latest
+  replicas: 1
+
+shipping:
+  image: robotshop/rs-shipping
+  tag: latest
+  replicas: 1
+
+payment:
+  image: robotshop/rs-payment
+  tag: latest
+  replicas: 1
+
+dispatch:
+  image: robotshop/rs-dispatch
+  tag: latest
+  replicas: 1
+
+ratings:
+  image: robotshop/rs-ratings
+  tag: latest
+  replicas: 1
+
+web:
+  image: robotshop/rs-web
+  tag: latest
+  replicas: 2
+  service:
+    type: LoadBalancer  
+    port: 80
+
+# ------------------------------------------------------------
+# Resource Requests/Limits (Real-time practice)
+# You can tune these per environment
+# ------------------------------------------------------------
+
+resources:
+  small:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+
+  medium:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  large:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 1Gi

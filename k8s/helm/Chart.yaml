@@ -1,0 +1,26 @@
+apiVersion: v2
+name: three-tier-demo
+description: A Helm chart for deploying the Three tier microservices application on Kubernetes (EKS) cluster.
+type: application
+
+# Chart version (version of this Helm packaging)
+# Bump this whenever you change templates/values structure.
+version: 0.1.0
+
+# Application version (logical app version — container versions)
+# Bump this when upgrading microservices code/images.
+appVersion: "1.0.0"
+
+# Optional but good practice in real-time
+keywords:
+  - microservices
+  - ecommerce
+  - three-tier-demo
+  - observability
+
+maintainers:
+  - name: platform-team
+    email: platform@example.com
+
+# Future-ready: if you want subcharts later (like Bitnami MySQL)
+# dependencies: []

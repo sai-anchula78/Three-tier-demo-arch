@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: payment
+    app.kubernetes.io/name: payment
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: robot-shop
+spec:
+  type: ClusterIP
+  selector:
+    app: payment
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: payment
+    app.kubernetes.io/name: payment
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: robot-shop
+spec:
+  replicas: {{ .Values.payment.replicas }}
+  selector:
+    matchLabels:
+      app: payment
+  template:
+    metadata:
+      labels:
+        app: payment
+        app.kubernetes.io/name: payment
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/part-of: robot-shop
+    spec:
+      containers:
+        - name: payment
+          image: "{{ .Values.payment.image }}:{{ .Values.payment.tag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: USER_HOST
+              value: "user"
+            - name: CART_HOST
+              value: "cart"
+          resources:
+            {{- toYaml .Values.resources.small | nindent 12 }}

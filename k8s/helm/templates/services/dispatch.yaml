@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dispatch
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: dispatch
+    app.kubernetes.io/name: dispatch
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: robot-shop
+spec:
+  type: ClusterIP
+  selector:
+    app: dispatch
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dispatch
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: dispatch
+    app.kubernetes.io/name: dispatch
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: robot-shop
+spec:
+  replicas: {{ .Values.dispatch.replicas }}
+  selector:
+    matchLabels:
+      app: dispatch
+  template:
+    metadata:
+      labels:
+        app: dispatch
+        app.kubernetes.io/name: dispatch
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/part-of: robot-shop
+    spec:
+      containers:
+        - name: dispatch
+          image: "{{ .Values.dispatch.image }}:{{ .Values.dispatch.tag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: MQ_HOST
+              value: "rabbitmq"
+          resources:
+            {{- toYaml .Values.resources.small | nindent 12 }}

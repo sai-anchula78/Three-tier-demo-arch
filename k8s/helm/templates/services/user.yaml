@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: user
+    app.kubernetes.io/name: user
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: robot-shop
+spec:
+  type: ClusterIP
+  selector:
+    app: user
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: user
+    app.kubernetes.io/name: user
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: robot-shop
+spec:
+  replicas: {{ .Values.user.replicas }}
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+        app.kubernetes.io/name: user
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/part-of: robot-shop
+    spec:
+      containers:
+        - name: user
+          image: "{{ .Values.user.image }}:{{ .Values.user.tag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: MONGO_HOST
+              value: "mongodb"
+            - name: MYSQL_HOST
+              value: "mysql"
+          resources:
+            {{- toYaml .Values.resources.small | nindent 12 }}
