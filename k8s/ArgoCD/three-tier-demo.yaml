@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: three-tier-demo
+  namespace: argocd           # ArgoCD watches Applications in its own ns
+spec:
+  project: default
+
+  source:
+    repoURL: 'https://github.com/sai-anchula78/Three-tier-demo-arch.git'
+    targetRevision: main      # or master, or a feature branch
+    path: k8s/helm/
+    helm:
+      valueFiles:
+        - values.yaml         # later you can add values-dev.yaml, values-prod.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: three-tier-demo     # where Robot-Shop will be deployed
+
+  syncPolicy:
+    automated:
+      prune: true             # delete resources removed from Git
+      selfHeal: true          # fix drift if someone kubectls stuff manually
+    syncOptions:
+      - CreateNamespace=true
