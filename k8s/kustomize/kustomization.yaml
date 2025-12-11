@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - manifests/databases/mongodb.yaml
+  - manifests/databases/redis.yaml
+  - manifests/messaging/rabbitmq.yaml
+  - manifests/services/cart.yaml
+  - manifests/services/catalogue.yaml
+  - manifests/services/dispatch.yaml
+  - manifests/services/orders.yaml
+  - manifests/services/payment.yaml
+  - manifests/services/ratings.yaml
+  - manifests/services/shipping.yaml
+  - manifests/services/user.yaml
+  - manifests/services/web.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: robot-shop
